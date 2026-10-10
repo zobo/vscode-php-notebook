@@ -40,7 +40,7 @@
       "notebook/cell/execute": [
         {
           "command": "php-notebook.debugCell",
-          "when": "notebookType == 'php-notebook' && notebookType == 'code'",
+          "when": "notebookType == 'php-notebook' && notebookCellType == 'code'",
           "group": "jupyterCellExecute@0"
         }
       ],

@@ -14,7 +14,7 @@
     {
       "kind": "code",
       "language": "php",
-      "source": "fwrite(STDERR, \"to stderr\\n\");\nthrow new Exception('boom');"
+      "source": "<?php\nfwrite(STDERR, \"to stderr\\n\");\nthrow new Exception('boom');"
     },
     {
       "kind": "code",

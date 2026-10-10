@@ -51,7 +51,7 @@ export class PhpNotebookController implements vscode.Disposable {
 			let env: NodeJS.ProcessEnv = process.env;
 			if (debug) {
 				const port = await getFreePort();
-				session = await this.startDebugSession(cell.notebook, port);
+				session = await this.startDebugSession(cell, file, port);
 				args = [...xdebugPhpArgs(port), file];
 				env = { ...process.env, ...xdebugEnv };
 			}
@@ -70,7 +70,12 @@ export class PhpNotebookController implements vscode.Disposable {
 	}
 
 	// php-debug's launch config without "program" waits for Xdebug to connect on the given port.
-	private async startDebugSession(notebook: vscode.NotebookDocument, port: number): Promise<vscode.DebugSession> {
+	// pathMappings maps the temp script (what PHP sees) to the cell's document URI (what the IDE sees).
+	private async startDebugSession(
+		cell: vscode.NotebookCell,
+		file: string,
+		port: number
+	): Promise<vscode.DebugSession> {
 		const name = `PHP Notebook ${port}`;
 		const started = new Promise<vscode.DebugSession>(resolve => {
 			const sub = vscode.debug.onDidStartDebugSession(s => {
@@ -81,8 +86,15 @@ export class PhpNotebookController implements vscode.Disposable {
 			});
 		});
 		const ok = await vscode.debug.startDebugging(
-			vscode.workspace.getWorkspaceFolder(notebook.uri),
-			{ type: 'php', request: 'launch', name, port },
+			vscode.workspace.getWorkspaceFolder(cell.notebook.uri),
+			{
+				type: 'php',
+				request: 'launch',
+				name,
+				port,
+				log: true,
+				pathMappings: { [file]: cell.document.uri.toString() },
+			},
 			{ suppressSaveBeforeStart: true }
 		);
 		if (!ok) {
