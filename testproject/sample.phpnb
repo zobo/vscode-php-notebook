@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "cells": [
+    { "kind": "markup", "language": "markdown", "source": "# PHP Notebook sample" },
+    { "kind": "code", "language": "php", "source": "echo \"Hello from PHP \" . PHP_VERSION . \"\\n\";\nvar_dump([1, 2, 3]);" },
+    { "kind": "code", "language": "php", "source": "fwrite(STDERR, \"to stderr\\n\");\nthrow new Exception('boom');" }
+  ]
+}
