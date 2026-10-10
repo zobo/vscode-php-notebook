@@ -9,7 +9,7 @@
     {
       "kind": "code",
       "language": "php",
-      "source": "<?php\necho \"Hello from PHP \" . PHP_VERSION . \"\\n\";\nxdebug_break();\nvar_dump([1, 2, 3]);"
+      "source": "<?php\necho \"Hello from PHP \" . PHP_VERSION . \"\\n\";\nvar_dump([1, 2, 3]);"
     },
     {
       "kind": "code",

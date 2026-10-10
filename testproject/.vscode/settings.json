@@ -1,4 +1,7 @@
 {
     "php.validate.executablePath": "C:\\local_disk\\zobo\\tools\\php\\php.exe",
-    "php-notebook.phpPath": "C:\\local_disk\\zobo\\tools\\php\\php.exe"
+    "php-notebook.phpPath": "C:\\local_disk\\zobo\\tools\\php\\php.exe",
+    "phpactor.trace.server": {
+        "verbosity": "message"
+    }
 }

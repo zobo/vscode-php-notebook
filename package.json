@@ -3,6 +3,7 @@
   "displayName": "PHP Notebook",
   "description": "Write, run and debug PHP code in a notebook.",
   "version": "0.0.1",
+  "publisher": "zobo",
   "engines": {
     "vscode": "^1.140.0"
   },

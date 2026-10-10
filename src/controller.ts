@@ -92,7 +92,6 @@ export class PhpNotebookController implements vscode.Disposable {
 				request: 'launch',
 				name,
 				port,
-				log: true,
 				pathMappings: { [file]: cell.document.uri.toString() },
 			},
 			{ suppressSaveBeforeStart: true }
