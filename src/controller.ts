@@ -3,8 +3,8 @@ import * as cp from 'child_process';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import { buildScript } from './format';
 import { NOTEBOOK_TYPE } from './serializer';
+import { getFreePort, xdebugEnv, xdebugPhpArgs } from './xdebug';
 
 export class PhpNotebookController implements vscode.Disposable {
 	private readonly controller: vscode.NotebookController;
@@ -27,35 +27,74 @@ export class PhpNotebookController implements vscode.Disposable {
 
 	private async execute(cells: vscode.NotebookCell[]): Promise<void> {
 		for (const cell of cells) {
-			await this.executeCell(cell);
+			await this.executeCell(cell, false);
 		}
 	}
 
-	private async executeCell(cell: vscode.NotebookCell): Promise<void> {
+	debugCell(cell: vscode.NotebookCell): Promise<void> {
+		return this.executeCell(cell, true);
+	}
+
+	private async executeCell(cell: vscode.NotebookCell, debug: boolean): Promise<void> {
 		const execution = this.controller.createNotebookCellExecution(cell);
 		execution.executionOrder = ++this.executionOrder;
 		execution.start(Date.now());
 		await execution.clearOutput();
 
 		let success = true;
+		let session: vscode.DebugSession | undefined;
 		try {
 			const file = this.writeScript(cell);
 			const phpPath = vscode.workspace.getConfiguration('php-notebook').get<string>('phpPath') || 'php';
 			const cwd = this.getCwd(cell.notebook);
-			success = await this.run(execution, phpPath, file, cwd);
+			let args = [file];
+			let env: NodeJS.ProcessEnv = process.env;
+			if (debug) {
+				const port = await getFreePort();
+				session = await this.startDebugSession(cell.notebook, port);
+				args = [...xdebugPhpArgs(port), file];
+				env = { ...process.env, ...xdebugEnv };
+			}
+			success = await this.run(execution, phpPath, args, cwd, env);
 		} catch (e) {
 			success = false;
 			await execution.appendOutput(
 				new vscode.NotebookCellOutput([vscode.NotebookCellOutputItem.error(e as Error)])
 			);
+		} finally {
+			if (session) {
+				await vscode.debug.stopDebugging(session);
+			}
 		}
 		execution.end(success, Date.now());
+	}
+
+	// php-debug's launch config without "program" waits for Xdebug to connect on the given port.
+	private async startDebugSession(notebook: vscode.NotebookDocument, port: number): Promise<vscode.DebugSession> {
+		const name = `PHP Notebook ${port}`;
+		const started = new Promise<vscode.DebugSession>(resolve => {
+			const sub = vscode.debug.onDidStartDebugSession(s => {
+				if (s.name === name) {
+					sub.dispose();
+					resolve(s);
+				}
+			});
+		});
+		const ok = await vscode.debug.startDebugging(
+			vscode.workspace.getWorkspaceFolder(notebook.uri),
+			{ type: 'php', request: 'launch', name, port },
+			{ suppressSaveBeforeStart: true }
+		);
+		if (!ok) {
+			throw new Error('Could not start the PHP debug session. Is the PHP Debug extension installed?');
+		}
+		return started;
 	}
 
 	private writeScript(cell: vscode.NotebookCell): string {
 		this.tmpDir ??= fs.mkdtempSync(path.join(os.tmpdir(), 'php-notebook-'));
 		const file = path.join(this.tmpDir, `cell-${cell.index}.php`);
-		fs.writeFileSync(file, buildScript(cell.document.getText()));
+		fs.writeFileSync(file, cell.document.getText());
 		return file;
 	}
 
@@ -69,11 +108,12 @@ export class PhpNotebookController implements vscode.Disposable {
 	private run(
 		execution: vscode.NotebookCellExecution,
 		phpPath: string,
-		file: string,
-		cwd: string | undefined
+		args: string[],
+		cwd: string | undefined,
+		env: NodeJS.ProcessEnv
 	): Promise<boolean> {
 		return new Promise(resolve => {
-			const child = cp.spawn(phpPath, [file], { cwd });
+			const child = cp.spawn(phpPath, args, { cwd, env });
 			const cancel = execution.token.onCancellationRequested(() => child.kill());
 
 			// Appends to the last output of the same mime type so streamed chunks form one block.

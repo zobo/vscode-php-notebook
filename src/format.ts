@@ -30,11 +30,4 @@ export function stringifyNotebook(nb: PhpNotebookFile): string {
 	return JSON.stringify(nb, null, 2) + '\n';
 }
 
-/**
- * Builds a runnable PHP script from a cell. The opening tag is placed on the
- * first line without a newline so that line numbers match the cell's lines.
- */
-export function buildScript(source: string): string {
-	const stripped = source.replace(/^\s*<\?php\b[ \t]?/i, '');
-	return '<?php ' + stripped;
-}
+export const DEFAULT_CELL_SOURCE = '<?php\n';

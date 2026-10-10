@@ -25,11 +25,32 @@
     ],
     "commands": [
       {
+        "command": "php-notebook.debugCell",
+        "title": "Debug Cell",
+        "category": "PHP Notebook",
+        "icon": "$(debug-alt)"
+      },
+      {
         "command": "php-notebook.newNotebook",
         "title": "New PHP Notebook",
         "category": "PHP Notebook"
       }
     ],
+    "menus": {
+      "notebook/cell/execute": [
+        {
+          "command": "php-notebook.debugCell",
+          "when": "notebookType == 'php-notebook' && notebookType == 'code'",
+          "group": "jupyterCellExecute@0"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "php-notebook.debugCell",
+          "when": "notebookType == 'php-notebook'"
+        }
+      ]
+    },
     "configuration": {
       "title": "PHP Notebook",
       "properties": {

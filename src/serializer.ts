@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { parseNotebook, stringifyNotebook } from './format';
+import { DEFAULT_CELL_SOURCE, parseNotebook, stringifyNotebook } from './format';
 
 export const NOTEBOOK_TYPE = 'php-notebook';
 
@@ -15,7 +15,7 @@ export class PhpNotebookSerializer implements vscode.NotebookSerializer {
 				)
 		);
 		if (cells.length === 0) {
-			cells.push(new vscode.NotebookCellData(vscode.NotebookCellKind.Code, '', 'php'));
+			cells.push(new vscode.NotebookCellData(vscode.NotebookCellKind.Code, DEFAULT_CELL_SOURCE, 'php'));
 		}
 		return new vscode.NotebookData(cells);
 	}

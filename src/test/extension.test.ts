@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import { buildScript, parseNotebook, stringifyNotebook } from '../format';
+import { DEFAULT_CELL_SOURCE, parseNotebook, stringifyNotebook } from '../format';
 
 suite('format', () => {
 	test('round trip', () => {
@@ -15,8 +15,7 @@ suite('format', () => {
 		assert.throws(() => parseNotebook('{}'));
 	});
 
-	test('buildScript keeps line numbers and strips open tag', () => {
-		assert.strictEqual(buildScript('echo 1;\necho 2;'), '<?php echo 1;\necho 2;');
-		assert.strictEqual(buildScript('<?php\necho 1;'), '<?php \necho 1;');
+	test('default cell source opens PHP', () => {
+		assert.strictEqual(DEFAULT_CELL_SOURCE, '<?php\n');
 	});
 });
