@@ -1,0 +1,42 @@
+name: Upload the extension
+
+on:
+  release:
+    types:
+      - created
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'v24.19.0'
+      - run: npm ci
+      - run: mkdir artifacts
+      - name: Package
+        # vscode:prepublish runs type check, lint and the production build
+        run: |
+          VERSION="${TAG_NAME#v}"
+          npx vsce package "$VERSION" --no-git-tag-version --no-update-package-json --out=artifacts/vscode-php-notebook.vsix
+        env:
+          TAG_NAME: ${{ github.event.release.tag_name }}
+      - name: Upload to GitHub release
+        run: gh release upload "$TAG_NAME" artifacts/vscode-php-notebook.vsix --clobber
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME: ${{ github.event.release.tag_name }}
+      - name: Publish to Visual Studio Marketplace
+        run: npx vsce publish --packagePath ./artifacts/vscode-php-notebook.vsix
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+      - name: Publish to Open VSX Registry
+        run: npx ovsx publish ./artifacts/vscode-php-notebook.vsix
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
