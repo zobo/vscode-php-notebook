@@ -1,4 +1,8 @@
 .vscode/**
+.github/**
+sample.phpnb
+testproject/**
+setup.bat
 .vscode-test/**
 out/**
 node_modules/**
