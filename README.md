@@ -1,71 +1,54 @@
-# php-notebook README
+# PHP Notebook
 
-This is the README for your extension "php-notebook". After writing up a brief description, we recommend including the following sections.
+Write, run and debug PHP in notebooks inside Visual Studio Code.
+
+PHP Notebook adds a notebook type for PHP (`.phpnb` files). Mix Markdown notes and PHP code cells, run each cell on its own, and step through it with a debugger when something doesn't behave.
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
-
-For example if there is an image subfolder under your extension project workspace:
-
-\!\[feature X\]\(images/feature-x.png\)
-
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+- **PHP notebooks:** create a `.phpnb` file or run **PHP Notebook: New PHP Notebook** from the Command Palette.
+- **Run cells:** run a cell with your local PHP. stdout and stderr appear below the cell as the script produces them, and you can interrupt a running cell.
+- **Debug cells:** the **Debug Cell** button next to Run starts the cell under Xdebug and attaches the [PHP Debug](https://marketplace.visualstudio.com/items?itemName=xdebug.php-debug) extension. Breakpoints set in the cell editor work, and you can step, inspect variables and view the call stack.
+- **Markdown cells:** document your experiments alongside the code.
+- **New cells start with `<?php`:** empty PHP cells get the opening tag, so syntax highlighting and language tooling work as in a normal PHP file.
+- **Language features:** completion, diagnostics and other editor features come from the PHP language extension you already use, such as Phpactor or Intelephense. This extension doesn't provide them.
+- **Diff-friendly file format:** notebooks are stored as plain JSON text. Outputs are not saved.
 
 ## Requirements
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+- PHP installed and available on your `PATH`, or configured with `php-notebook.phpPath`.
+- To debug cells:
+  - The [PHP Debug](https://marketplace.visualstudio.com/items?itemName=xdebug.php-debug) extension.
+  - [Xdebug](https://xdebug.org/docs/install) enabled in your PHP installation.
+
+## Usage
+
+1. Create a file ending in `.phpnb` and open it, or run **PHP Notebook: New PHP Notebook**.
+2. Select the **PHP** kernel if VS Code asks for one.
+3. Write PHP code in a cell, starting with `<?php`, and press **Run** (`Ctrl+Enter` / `Shift+Enter`).
+4. To debug, set a breakpoint in the cell and press **Debug Cell**, or run **PHP Notebook: Debug Cell** from the Command Palette.
+
+The cell's working directory is the folder that contains the notebook.
+
+## Current limitations
+
+- **Cells are isolated.** Each cell runs as its own PHP script, so variables, functions and classes defined in one cell are not available in the next.
+- **Language servers analyze cells separately,** so symbols defined in other cells are not resolved.
+- **Outputs are plain text** (stdout and stderr). Rich output such as HTML or tables is not supported yet.
 
 ## Extension Settings
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+| Setting | Default | Description |
+| --- | --- | --- |
+| `php-notebook.phpPath` | `php` | Path to the PHP executable used to run cells. |
 
-For example:
+## Commands
 
-This extension contributes the following settings:
+| Command | Description |
+| --- | --- |
+| `PHP Notebook: New PHP Notebook` | Create and open an empty PHP notebook. |
+| `PHP Notebook: Debug Cell` | Run the selected cell under the debugger. |
 
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+## Feedback
 
-## Known Issues
-
-Calling out known issues can help limit users opening duplicate issues against your extension.
-
-## Release Notes
-
-Users appreciate release notes as you update your extension.
-
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
----
-
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+Found a bug or have an idea? Please open an issue on [GitHub](https://github.com/zobo/vscode-php-notebook/issues).
